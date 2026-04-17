@@ -1,0 +1,211 @@
+================================================================
+  EnJoyCafe  —  Setup Guide
+  Eclipse + Tomcat 9 + JDK 1.8 + WAMP (MySQL)
+================================================================
+
+STEP 1 — Run the Database
+--------------------------
+1. Start WAMP and make sure MySQL is running (icon turns green)
+2. Open phpMyAdmin: http://localhost/phpmyadmin
+3. Click "New" in the left panel → type database name: enjoycafe → click Create
+4. Click the "enjoycafe" database → click the "SQL" tab at the top
+5. Open the file "database_setup.sql" (inside this project folder)
+6. Copy ALL the contents and paste into the SQL tab in phpMyAdmin
+7. Click "Go" to execute
+8. You should see all tables created: admin, categories, products,
+   customers, orders, order_items, staff, reviews
+
+   Admin login: username=admin  password=admin123
+
+
+STEP 2 — Download MySQL Connector JAR
+---------------------------------------
+1. Go to: https://dev.mysql.com/downloads/connector/j/
+2. Select "Platform Independent" from the dropdown
+3. Download the ZIP file and extract it
+4. You will find a file named: mysql-connector-j-8.x.x.jar
+   Keep this file ready for Step 4.
+
+
+STEP 3 — Import Project into Eclipse
+--------------------------------------
+1. Open Eclipse IDE for Enterprise Java and Web Developers
+2. Go to: File → Import
+3. Select: General → Existing Projects into Workspace → Next
+4. Click "Browse" → navigate to the "EnJoyCafe" folder → Select Folder
+5. You will see "EnJoyCafe" listed with a checkbox → click Finish
+6. The project will appear in Project Explorer on the left
+
+
+STEP 4 — Add MySQL JAR to Project
+------------------------------------
+1. In Project Explorer, expand: EnJoyCafe → webapp → WEB-INF → lib
+2. Copy the "mysql-connector-j-8.x.x.jar" file
+3. Paste it into the "lib" folder (drag and drop from Windows Explorer
+   directly into the lib folder shown in Eclipse Project Explorer)
+4. Eclipse will ask "Copy files?" → click OK
+5. Now right-click on "EnJoyCafe" project → Build Path → Configure Build Path
+6. Click the "Libraries" tab
+7. Click "Add JARs..." button
+8. Navigate to: EnJoyCafe → webapp → WEB-INF → lib → select the JAR → OK
+9. Click "Apply and Close"
+
+
+STEP 5 — Set Project Facets
+------------------------------
+1. Right-click on "EnJoyCafe" in Project Explorer → Properties
+2. Click "Project Facets" in the left menu
+3. Make sure these are checked:
+      Dynamic Web Module  →  3.1
+      Java                →  1.8
+4. If Java shows a different version, click the dropdown and select 1.8
+5. Click "Apply and Close"
+
+
+STEP 6 — Update Your MySQL Password
+--------------------------------------
+Open this file in Eclipse:
+   webapp → includes → connection.jsp
+
+Find these lines and change the password to your WAMP MySQL password:
+   static final String DB_USER = "root";
+   static final String DB_PASS = "root";   ← change this
+
+NOTE: Default WAMP MySQL password is usually blank ("") or "root"
+If your password is blank, use:  static final String DB_PASS = "";
+
+Save the file with Ctrl+S.
+
+
+STEP 7 — Add Tomcat 9 to Eclipse (skip if already done)
+----------------------------------------------------------
+1. Go to: Window → Preferences
+2. Expand: Server → Runtime Environments → Add
+3. Expand Apache → select "Apache Tomcat v9.0" → Next
+4. Click Browse → navigate to your Tomcat 9 installation folder
+   (Usually: C:\Program Files\Apache Software Foundation\Tomcat 9.0)
+5. Set JRE to "JDK 1.8" using the dropdown
+6. Click Finish → Apply and Close
+
+
+STEP 8 — Run on Tomcat
+------------------------
+1. Right-click on "EnJoyCafe" project in Project Explorer
+2. Select: Run As → Run on Server
+3. Select "Apache Tomcat v9.0" → Finish
+4. Eclipse will build, deploy and start Tomcat
+5. Wait for the Console to show:
+      INFO: Server startup in [X] ms
+6. A browser tab will open automatically
+
+
+STEP 9 — Access the Application
+----------------------------------
+Customer Website:
+   http://localhost:8080/EnJoyCafe/
+
+Customer Pages:
+   http://localhost:8080/EnJoyCafe/menu.jsp
+   http://localhost:8080/EnJoyCafe/about.jsp
+   http://localhost:8080/EnJoyCafe/contact.jsp
+   http://localhost:8080/EnJoyCafe/reviews.jsp
+   http://localhost:8080/EnJoyCafe/login.jsp
+   http://localhost:8080/EnJoyCafe/register.jsp
+
+Admin Panel:
+   http://localhost:8080/EnJoyCafe/admin/login.jsp
+   Username: admin
+   Password: admin123
+
+
+================================================================
+  COMMON ERRORS & FIXES
+================================================================
+
+ERROR: ClassNotFoundException: com.mysql.cj.jdbc.Driver
+FIX:   The MySQL JAR is missing or not on Build Path.
+       Repeat Step 4 carefully.
+
+ERROR: Access denied for user 'root'@'localhost'
+FIX:   Wrong password in connection.jsp. Open WAMP phpMyAdmin
+       and check your MySQL password. Update connection.jsp.
+
+ERROR: Unknown database 'enjoycafe'
+FIX:   The SQL script was not run. Repeat Step 1.
+
+ERROR: Port 8080 already in use
+FIX:   Double-click Tomcat in the Servers tab (bottom of Eclipse)
+       Change HTTP port from 8080 to 8081
+       Then access: http://localhost:8081/EnJoyCafe/
+
+ERROR: 404 - The requested resource is not available
+FIX:   Check the URL spelling. Make sure Project Facets has
+       Dynamic Web Module enabled (Step 5).
+
+ERROR: JSP shows raw source code instead of rendered page
+FIX:   Project is not deployed as a Web project.
+       Check Step 5 (Project Facets).
+
+ERROR: Context Root mismatch (URL doesn't match project name)
+FIX:   Right-click project → Properties → Web Project Settings
+       Change Context Root to: EnJoyCafe
+
+================================================================
+  PROJECT STRUCTURE (flat JSP, no MVC, no Java classes)
+================================================================
+
+EnJoyCafe/
+└── webapp/
+    ├── index.jsp                ← Homepage
+    ├── menu.jsp                 ← Full menu + cart
+    ├── about.jsp                ← About page
+    ├── contact.jsp              ← Contact & map
+    ├── reviews.jsp              ← Reviews + submit form
+    ├── login.jsp                ← Customer login
+    ├── register.jsp             ← Customer register
+    ├── logout.jsp               ← Customer logout
+    ├── checkout.jsp             ← Checkout (address + payment)
+    ├── place-order.jsp          ← Server: processes order
+    ├── order-success.jsp        ← Order confirmed screen
+    ├── my-orders.jsp            ← Customer order history
+    ├── order-detail.jsp         ← Single order view + timeline
+    │
+    ├── includes/
+    │   ├── connection.jsp       ← DB connection (include everywhere)
+    │   ├── header.jsp           ← Customer navbar + cart sidebar
+    │   ├── footer.jsp           ← Customer footer + scripts
+    │   ├── admin_header.jsp     ← Admin sidebar + topbar
+    │   └── admin_footer.jsp     ← Admin closing tags + scripts
+    │
+    ├── admin/
+    │   ├── login.jsp            ← Admin login
+    │   ├── logout.jsp           ← Admin logout
+    │   ├── dashboard.jsp        ← Stats + recent orders
+    │   ├── products.jsp         ← Add / Edit / Delete products
+    │   ├── categories.jsp       ← Manage categories
+    │   ├── orders.jsp           ← Orders list + detail + status
+    │   ├── staff.jsp            ← Staff CRUD + card view
+    │   ├── customers.jsp        ← Customer list
+    │   ├── reviews.jsp          ← Approve / reject reviews
+    │   └── settings.jsp         ← Admin profile + password change
+    │
+    ├── css/
+    │   ├── style.css            ← Global styles (customer + shared)
+    │   └── admin.css            ← Admin panel styles
+    │
+    ├── js/
+    │   ├── cart.js              ← Cart logic (localStorage)
+    │   ├── main.js              ← General UI helpers
+    │   └── admin.js             ← Admin panel JS
+    │
+    ├── images/
+    │   ├── products/            ← Place product images here
+    │   └── staff/               ← Place staff photos here
+    │
+    ├── WEB-INF/
+    │   ├── web.xml
+    │   └── lib/                 ← Place mysql-connector JAR here
+    │
+    └── database_setup.sql       ← Run this in phpMyAdmin first
+
+================================================================
